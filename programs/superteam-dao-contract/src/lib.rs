@@ -42,4 +42,8 @@ pub mod superteam_dao_contract {
         Ok(())
     }
 
+    pub fn close_proposal(ctx: Context<CloseProposal>) -> Result<()> {
+        close_proposal::handler(ctx);
+        Ok(())
+    }
 }

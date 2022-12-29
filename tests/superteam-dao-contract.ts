@@ -157,8 +157,8 @@ describe("superteam-dao-contract", () => {
             .signers([recipient])
             .rpc();
 
-        let proposalCancelData2= await program.account.proposal.fetch(proposalAccount2);
-        console.log("[proposal cancel account 1] Create result: ", proposalCancelData2);
+        let proposalRejectData2= await program.account.proposal.fetch(proposalAccount2);
+        console.log("[proposal cancel account 2] Create result: ", proposalRejectData2);
 
     });
 
@@ -193,6 +193,46 @@ describe("superteam-dao-contract", () => {
 
         console.log('sender ATA token balance', await getTokenBalance(senderTokenAccount, provider));
         console.log('recipient ATA token balance after', await getTokenBalance(recipientTokenAccount, provider));
+
+    });
+
+    it("close cancel or reject  proposal", async () => {
+
+        const balanceBefore = await provider.connection.getBalance(sender.publicKey);
+        console.log("[sender balance before close proposal]: ", balanceBefore);
+        const balanceProposalAccount2 = await provider.connection.getBalance(proposalAccount2);
+        console.log("[proposalAccount 2 balance]: ", balanceProposalAccount2);
+
+        await program.methods.closeProposal()
+            .accounts({
+                proposal: proposalAccount2,
+                sender: sender.publicKey,
+                systemProgram: SystemProgram.programId,
+            })
+            .signers([sender])
+            .rpc();
+
+
+
+        const balanceAfter = await provider.connection.getBalance(sender.publicKey);
+        console.log("[sender balance after close proposal]: ", balanceAfter);
+
+
+    });
+
+    it("close pending and approve proposal", async () => {
+
+        await program.methods.closeProposal()
+            .accounts({
+                proposal: proposalAccount,
+                sender: sender.publicKey,
+                systemProgram: SystemProgram.programId,
+            })
+            .signers([sender])
+            .rpc();
+
+        let proposalApproveData= await program.account.proposal.fetch(proposalAccount);
+        console.log("[proposal approve account] Create result: ", proposalApproveData);
 
     });
 
