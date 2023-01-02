@@ -39,6 +39,23 @@ pub fn handler(
     let identifier = &mut ctx.accounts.identifier;
     let proposal = &mut ctx.accounts.proposal;
 
+    if image.chars().count() > MAX_LENGTH_IMAGE {
+        return Err(ErrorCodes::ImageTooLong.into())
+    }
+
+    if title.chars().count() > MAX_LENGTH_TITLE {
+        return Err(ErrorCodes::TitleTooLong.into())
+    }
+
+    if subtitle.chars().count() > MAX_LENGTH_SUBTITLE {
+        return Err(ErrorCodes::SubtitleTooLong.into())
+    }
+
+    if tags.chars().count() > MAX_LENGTH_TAGS {
+        return Err(ErrorCodes::TagsTooLong.into())
+    }
+
+
     proposal.recipient = recipient;
     proposal.sender = ctx.accounts.sender.key();
     proposal.image = image;

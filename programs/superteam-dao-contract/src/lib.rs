@@ -10,7 +10,7 @@ use crate::error::*;
 use instructions::*;
 use schemas::*;
 
-declare_id!("EQA7EsMus3Bj4UC5czQ28gjK6tDdvz1572qr2XSnvTQV");
+declare_id!("2kAE3hehkVtyjfwBE9mMYgzMMD4uH6s6GLVwzuK179pV");
 
 #[program]
 pub mod superteam_dao_contract {
@@ -37,8 +37,8 @@ pub mod superteam_dao_contract {
         Ok(())
     }
 
-    pub fn approve_proposal(ctx: Context<ApproveProposal>) -> Result<()> {
-        approve_proposal::handler(ctx);
+    pub fn approve_proposal(ctx: Context<ApproveProposal>, transaction_hash: Option<String>) -> Result<()> {
+        approve_proposal::handler(ctx, transaction_hash);
         Ok(())
     }
 

@@ -35,13 +35,13 @@ describe("superteam-dao-contract", () => {
     let mintA;
 
     before("Boilerplates", async () => {
-        //airdrop
+        airdrop
         const delay = ms => new Promise(res => setTimeout(res, ms));
-        await delay(1000*2);
+        await delay(1000*5);
         await airdrop(provider, sender.publicKey, airdropSolAmount)
-        await delay(1000*2);
+        await delay(1000*5);
         await airdrop(provider, payer.publicKey, airdropSolAmount)
-        await delay(1000*2);
+        await delay(1000*5);
         await airdrop(provider, recipient.publicKey, airdropSolAmount)
 
     });
@@ -163,24 +163,9 @@ describe("superteam-dao-contract", () => {
     });
 
     it("approve  proposal", async () => {
-        let senderTokenAccount = await mintA.createAccount(sender.publicKey);
-        let recipientTokenAccount = await mintA.createAccount(recipient.publicKey);
-
-        // Send token A to recipient token amount
-        let amountTransfer = 1000*(10**MINT_A_DECIMALS)
-        await mintTokenAToUser(
-            recipientTokenAccount,
-            mintA,
-            amountTransfer,
-            payer
-        )
-        console.log('recipient ATA token balance', await getTokenBalance(recipientTokenAccount, provider));
-        await program.methods.approveProposal()
+        await program.methods.approveProposal("")
             .accounts({
                 proposal: proposalAccount,
-                senderTokenAccount: senderTokenAccount,
-                recipientTokenAccount: recipientTokenAccount,
-                mint: mintA.publicKey,
                 recipient: recipient.publicKey,
                 systemProgram: SystemProgram.programId,
                 tokenProgram: TOKEN_PROGRAM_ID,
@@ -190,10 +175,6 @@ describe("superteam-dao-contract", () => {
 
         let proposalApproveData= await program.account.proposal.fetch(proposalAccount);
         console.log("[proposal approve account] Create result: ", proposalApproveData);
-
-        console.log('sender ATA token balance', await getTokenBalance(senderTokenAccount, provider));
-        console.log('recipient ATA token balance after', await getTokenBalance(recipientTokenAccount, provider));
-
     });
 
     it("close cancel or reject  proposal", async () => {
@@ -217,7 +198,6 @@ describe("superteam-dao-contract", () => {
         const balanceAfter = await provider.connection.getBalance(sender.publicKey);
         console.log("[sender balance after close proposal]: ", balanceAfter);
 
-
     });
 
     it("close pending and approve proposal", async () => {
@@ -233,6 +213,72 @@ describe("superteam-dao-contract", () => {
 
         let proposalApproveData= await program.account.proposal.fetch(proposalAccount);
         console.log("[proposal approve account] Create result: ", proposalApproveData);
+
+    });
+
+    it("get all proposal ", async () => {
+        const proposal = await program.account.proposal.all();
+        console.log(proposal);
+
+    });
+
+    it("filter proposal by sender ", async () => {
+        let sender = new PublicKey("Dv8z4g6azCswAFhRETfnTd1UpTE68ZdRswwctMEhR285");
+        const proposalBySender = await program.account.proposal.all([
+            {
+                memcmp: {
+                    offset: 40, // Discriminator.
+                    bytes: sender.toBase58(),
+                }
+            }
+        ]);
+
+        console.log(proposalBySender);
+
+    });
+
+    it("filter proposal by recipient ", async () => {
+        let recipient = new PublicKey("AyeFqRkAwhjrmpDsd2e2MgckBjrhWEexj9py69UGxLke");
+        const proposalByRecipient = await program.account.proposal.all([
+            {
+                memcmp: {
+                    offset: 8, // Discriminator.
+                    bytes: recipient.toBase58(),
+                }
+            }
+        ]);
+
+        console.log(proposalByRecipient);
+
+    });
+
+    it("filter proposal by status ", async () => {
+        let status = new BN(1);
+        const proposalByStatus = await program.account.proposal.all([
+            {
+                memcmp: {
+                    offset: 74, // Discriminator.
+                    bytes: bs58.encode(status.toBuffer()),
+                }
+            }
+        ]);
+
+        console.log(proposalByStatus);
+
+    });
+
+    it("filter proposal by image ", async () => {
+        let status = new BN(1);
+        const proposalByImage = await program.account.proposal.all([
+            {
+                memcmp: {
+                    offset: 8 + 32 + 32 + 1 + 1 + 4, // Discriminator.
+                    bytes: bs58.encode(Buffer.from("https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png")),
+                }
+            }
+        ]);
+
+        console.log(proposalByImage);
 
     });
 
