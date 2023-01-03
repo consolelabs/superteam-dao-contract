@@ -77,7 +77,7 @@ describe("superteam-dao-contract", () => {
         [proposalAccount, proposalAccountBump] = await findPDAProposal(sender.publicKey, identifierData.count, program)
 
         await program.methods.createProposal(recipient.publicKey, "https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png",
-            "Solana Coding Camp Winner", "", mintA.publicKey, "solanacamp", new BN(100*(10**MINT_A_DECIMALS)))
+            "Orca summer Winner", "", mintA.publicKey, "gamefi", new BN(100*(10**MINT_A_DECIMALS)))
             .accounts({
                 proposal: proposalAccount,
                 identifier: identifierAccount,
@@ -96,7 +96,7 @@ describe("superteam-dao-contract", () => {
         [proposalAccount1, proposalAccountBump1] = await findPDAProposal(sender.publicKey, identifierData.count, program)
 
         await program.methods.createProposal(recipient.publicKey, "https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png",
-            "Solana Coding Camp 2nd", "", mintA.publicKey, "solanacamp", new BN(100*(10**MINT_A_DECIMALS)))
+            "Orca summer 2nd", "", mintA.publicKey, "defi", new BN(100*(10**MINT_A_DECIMALS)))
             .accounts({
                 proposal: proposalAccount1,
                 identifier: identifierAccount,
@@ -116,7 +116,7 @@ describe("superteam-dao-contract", () => {
         [proposalAccount2, proposalAccountBump2] = await findPDAProposal(sender.publicKey, identifierData.count, program)
 
         await program.methods.createProposal(recipient.publicKey, "https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png",
-            "Solana Coding Camp 3rd", "", mintA.publicKey, "solanacamp", new BN(100*(10**MINT_A_DECIMALS)))
+            "Orca summer 3rd", "", mintA.publicKey, "orca", new BN(100*(10**MINT_A_DECIMALS)))
             .accounts({
                 proposal: proposalAccount2,
                 identifier: identifierAccount,
@@ -223,7 +223,7 @@ describe("superteam-dao-contract", () => {
     });
 
     it("filter proposal by sender ", async () => {
-        let sender = new PublicKey("Dv8z4g6azCswAFhRETfnTd1UpTE68ZdRswwctMEhR285");
+        let sender = new PublicKey("J831y4jyRXukQrhLSKg8fY4nNUdzRXzgw7jHuMzKRP81");
         const proposalBySender = await program.account.proposal.all([
             {
                 memcmp: {
@@ -238,7 +238,7 @@ describe("superteam-dao-contract", () => {
     });
 
     it("filter proposal by recipient ", async () => {
-        let recipient = new PublicKey("AyeFqRkAwhjrmpDsd2e2MgckBjrhWEexj9py69UGxLke");
+        let recipient = new PublicKey("CsYj7vtRvE9ZaFghEQqA7JdaBxvPkeFWc2ucNuz8PoWU");
         const proposalByRecipient = await program.account.proposal.all([
             {
                 memcmp: {

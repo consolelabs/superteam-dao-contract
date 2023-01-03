@@ -8,13 +8,13 @@ pub struct Proposal {
     pub recipient: Pubkey,
     pub sender: Pubkey,
     pub status: u8,
+    pub tags: String,
     pub transaction: Option<String>,
     pub image: String,
     pub title: String,
     pub subtitle: String,
     pub spl: Pubkey,
     pub amount: u64,
-    pub tags: String,
     pub identifier: u64,
 }
 
