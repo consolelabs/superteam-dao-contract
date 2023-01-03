@@ -22,8 +22,8 @@ pub mod superteam_dao_contract {
     }
 
     pub fn create_proposal(ctx: Context<CreateProposal>, recipient: Pubkey, image: String, title: String, subtitle: String,
-                           spl: Pubkey, tags: String, amount: u64) -> Result<()> {
-        create_proposal::handler(ctx, recipient, image, title, subtitle, spl, tags, amount);
+                           spl: Pubkey, tags: String, amount: u64, is_owner: bool) -> Result<()> {
+        create_proposal::handler(ctx, recipient, image, title, subtitle, spl, tags, amount, is_owner);
         Ok(())
     }
 

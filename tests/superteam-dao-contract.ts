@@ -77,7 +77,7 @@ describe("superteam-dao-contract", () => {
         [proposalAccount, proposalAccountBump] = await findPDAProposal(sender.publicKey, identifierData.count, program)
 
         await program.methods.createProposal(recipient.publicKey, "https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png",
-            "Orca summer Winner", "", mintA.publicKey, "gamefi", new BN(100*(10**MINT_A_DECIMALS)))
+            "Orca summer Winner", "", mintA.publicKey, "gamefi", new BN(100*(10**MINT_A_DECIMALS)), true)
             .accounts({
                 proposal: proposalAccount,
                 identifier: identifierAccount,
@@ -96,7 +96,7 @@ describe("superteam-dao-contract", () => {
         [proposalAccount1, proposalAccountBump1] = await findPDAProposal(sender.publicKey, identifierData.count, program)
 
         await program.methods.createProposal(recipient.publicKey, "https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png",
-            "Orca summer 2nd", "", mintA.publicKey, "defi", new BN(100*(10**MINT_A_DECIMALS)))
+            "Orca summer 2nd", "", mintA.publicKey, "defi", new BN(100*(10**MINT_A_DECIMALS)), true)
             .accounts({
                 proposal: proposalAccount1,
                 identifier: identifierAccount,
@@ -116,7 +116,7 @@ describe("superteam-dao-contract", () => {
         [proposalAccount2, proposalAccountBump2] = await findPDAProposal(sender.publicKey, identifierData.count, program)
 
         await program.methods.createProposal(recipient.publicKey, "https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png",
-            "Orca summer 3rd", "", mintA.publicKey, "orca", new BN(100*(10**MINT_A_DECIMALS)))
+            "Orca summer 3rd", "", mintA.publicKey, "orca", new BN(100*(10**MINT_A_DECIMALS)), true)
             .accounts({
                 proposal: proposalAccount2,
                 identifier: identifierAccount,
@@ -264,21 +264,6 @@ describe("superteam-dao-contract", () => {
         ]);
 
         console.log(proposalByStatus);
-
-    });
-
-    it("filter proposal by image ", async () => {
-        let status = new BN(1);
-        const proposalByImage = await program.account.proposal.all([
-            {
-                memcmp: {
-                    offset: 8 + 32 + 32 + 1 + 1 + 4, // Discriminator.
-                    bytes: bs58.encode(Buffer.from("https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png")),
-                }
-            }
-        ]);
-
-        console.log(proposalByImage);
 
     });
 
