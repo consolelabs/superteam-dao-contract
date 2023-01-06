@@ -29,3 +29,23 @@ export async function findPDAProposal(owner: PublicKey, identifierCount: BN, pro
     );
 
 }
+
+export const getPage = async (page, perPage, accountPublicKeys, program) => {
+    const paginatedPublicKeys = accountPublicKeys.slice(
+        (page - 1) * perPage,
+        page * perPage,
+    );
+
+    if (paginatedPublicKeys.length === 0) {
+        return [];
+    }
+    let arrayData:any[] = [];
+
+
+    for (var i = 0; i < paginatedPublicKeys.length; i++) {
+        let data = await program.account.proposal.fetch(paginatedPublicKeys[i])
+        arrayData.push(data)
+    }
+
+    return arrayData;
+}
