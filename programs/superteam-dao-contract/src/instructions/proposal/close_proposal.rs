@@ -25,7 +25,7 @@ pub fn handler(
     ctx: Context<CloseProposal>,
 ) -> Result<()> {
     let proposal = & ctx.accounts.proposal;
-    if proposal.status == 1 ||  proposal.status == 3{
+    if proposal.status == 3{
         proposal.close(ctx.accounts.sender.to_account_info())?
     }
     Ok(())

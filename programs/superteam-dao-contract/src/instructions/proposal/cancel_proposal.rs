@@ -10,7 +10,8 @@ pub struct CancelProposal<'info> {
     #[account(
         mut,
         constraint = *sender.key == proposal.sender
-        @ ErrorCodes::SenderInvalidStateAccount
+        @ ErrorCodes::SenderInvalidStateAccount,
+        close = sender
     )]
     pub proposal: Account<'info, Proposal>,
 
