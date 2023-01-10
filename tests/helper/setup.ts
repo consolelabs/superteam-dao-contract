@@ -23,7 +23,6 @@ export async function findPDAProposal(owner: PublicKey, identifierCount: BN, pro
             Buffer.from(constants.proposalSeed),
             owner.toBuffer(),
             identifierCount.toArrayLike(Buffer, "le", 8)
-            ,
         ],
         program.programId
     );

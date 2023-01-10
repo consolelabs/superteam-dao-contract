@@ -11,6 +11,7 @@ pub struct Proposal {
     pub owner: bool,
     pub spl: Pubkey,
     pub amount: u64,
+    pub pop_status: u8,
     pub tags: String,
     pub transaction: Option<String>,
     pub image: String,
@@ -29,6 +30,7 @@ impl Proposal {
         1 + // owner
         PUBKEY_SIZE + // spl
         U64_SIZE + // amount
+        1 + // pop_status: 0-pending 1-confirm 2-reject
         4 + MAX_LENGTH_TAGS + // tags
         1 + 4 + LENGTH_TRANSACTION_HASH + // transaction hash
         4 + MAX_LENGTH_IMAGE + // image

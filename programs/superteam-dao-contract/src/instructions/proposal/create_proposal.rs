@@ -34,7 +34,7 @@ pub struct CreateProposal<'info> {
 pub fn handler(
     ctx: Context<CreateProposal>,
     recipient: Pubkey, image: String, title: String, subtitle: String,
-    spl: Pubkey, tags: String, amount: u64, is_owner: bool
+    spl: Pubkey, tags: String, amount: u64, is_owner: bool, transaction_hash: Option<String>
 ) -> Result<()> {
     let identifier = &mut ctx.accounts.identifier;
     let proposal = &mut ctx.accounts.proposal;
@@ -67,6 +67,8 @@ pub fn handler(
     proposal.owner = is_owner;
     proposal.identifier = identifier.count;
     proposal.status = 0;
+    proposal.pop_status = 0;
+    proposal.transaction = transaction_hash;
 
     identifier.count += 1;
 

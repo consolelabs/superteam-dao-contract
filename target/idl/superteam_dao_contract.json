@@ -89,6 +89,12 @@
         {
           "name": "isOwner",
           "type": "bool"
+        },
+        {
+          "name": "transactionHash",
+          "type": {
+            "option": "string"
+          }
         }
       ]
     },
@@ -158,14 +164,7 @@
           "isSigner": false
         }
       ],
-      "args": [
-        {
-          "name": "transactionHash",
-          "type": {
-            "option": "string"
-          }
-        }
-      ]
+      "args": []
     },
     {
       "name": "closeProposal",
@@ -187,6 +186,76 @@
         }
       ],
       "args": []
+    },
+    {
+      "name": "applicantConfirmProposal",
+      "accounts": [
+        {
+          "name": "proposal",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "applicant",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "applicantRejectProposal",
+      "accounts": [
+        {
+          "name": "proposal",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "applicant",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "fillTransactionHash",
+      "accounts": [
+        {
+          "name": "proposal",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "transactionHash",
+          "type": {
+            "option": "string"
+          }
+        }
+      ]
     }
   ],
   "accounts": [
@@ -234,6 +303,10 @@
           {
             "name": "amount",
             "type": "u64"
+          },
+          {
+            "name": "popStatus",
+            "type": "u8"
           },
           {
             "name": "tags",
@@ -330,6 +403,16 @@
       "code": 6012,
       "name": "ImageTooLong",
       "msg": "The provided image should be 256 characters long maximum."
+    },
+    {
+      "code": 6013,
+      "name": "TransactionHashIsNotValid",
+      "msg": "The transaction hash is needed"
+    },
+    {
+      "code": 6014,
+      "name": "InvalidProposal",
+      "msg": "Proposal is invalid"
     }
   ]
 }

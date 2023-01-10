@@ -22,8 +22,8 @@ pub mod superteam_dao_contract {
     }
 
     pub fn create_proposal(ctx: Context<CreateProposal>, recipient: Pubkey, image: String, title: String, subtitle: String,
-                           spl: Pubkey, tags: String, amount: u64, is_owner: bool) -> Result<()> {
-        create_proposal::handler(ctx, recipient, image, title, subtitle, spl, tags, amount, is_owner);
+                           spl: Pubkey, tags: String, amount: u64, is_owner: bool, transaction_hash: Option<String>) -> Result<()> {
+        create_proposal::handler(ctx, recipient, image, title, subtitle, spl, tags, amount, is_owner, transaction_hash);
         Ok(())
     }
 
@@ -37,8 +37,8 @@ pub mod superteam_dao_contract {
         Ok(())
     }
 
-    pub fn approve_proposal(ctx: Context<ApproveProposal>, transaction_hash: Option<String>) -> Result<()> {
-        approve_proposal::handler(ctx, transaction_hash);
+    pub fn approve_proposal(ctx: Context<ApproveProposal>) -> Result<()> {
+        approve_proposal::handler(ctx);
         Ok(())
     }
 
@@ -46,4 +46,20 @@ pub mod superteam_dao_contract {
         close_proposal::handler(ctx);
         Ok(())
     }
+
+    pub fn applicant_confirm_proposal(ctx: Context<ApplicantConfirmProposal>) -> Result<()> {
+        applicant_confirm_proposal::handler(ctx);
+        Ok(())
+    }
+
+    pub fn applicant_reject_proposal(ctx: Context<ApplicantRejectProposal>) -> Result<()> {
+        applicant_reject_proposal::handler(ctx);
+        Ok(())
+    }
+
+    pub fn fill_transaction_hash(ctx: Context<FillTransactionHash>, transaction_hash: Option<String>) -> Result<()> {
+        fill_transaction_hash::handler(ctx, transaction_hash);
+        Ok(())
+    }
+
 }

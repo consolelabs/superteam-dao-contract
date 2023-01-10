@@ -26,30 +26,26 @@ describe("superteam-dao-contract", () => {
     const program = anchor.workspace.SuperteamDaoContract as Program<SuperteamDaoContract>;
 
     const airdropSolAmount = 2;
-    const solToSend   =   0.5;
 
-    let payer = anchor.web3.Keypair.generate();
     let sender = anchor.web3.Keypair.generate();
     let recipient = anchor.web3.Keypair.generate();
-    let identifierAccount, proposalAccount, proposalAccount1, proposalAccount2 : anchor.web3.PublicKey;
-    let identifierAccountBump, proposalAccountBump, proposalAccountBump1, proposalAccountBump2: number;
+    let identifierAccount, applicantProposal, applicantProposal1, applicantProposal2 : anchor.web3.PublicKey;
+    let identifierAccount2, approverProposal, approverProposal1, approverProposal2 : anchor.web3.PublicKey;
+    let bump: number;
     let mintA;
 
     before("Boilerplates", async () => {
-        airdrop
         const delay = ms => new Promise(res => setTimeout(res, ms));
         await delay(1000*5);
         await airdrop(provider, sender.publicKey, airdropSolAmount)
-        await delay(1000*5);
-        await airdrop(provider, payer.publicKey, airdropSolAmount)
         await delay(1000*5);
         await airdrop(provider, recipient.publicKey, airdropSolAmount)
 
     });
 
-    it("initialize identifier and proposal", async () => {
+    it("[Applicant flow] initialize identifier and proposal", async () => {
 
-        [identifierAccount, identifierAccountBump] = await findPDAIdentifier(sender.publicKey, program)
+        [identifierAccount] = await findPDAIdentifier(sender.publicKey, program)
 
         await program.methods.createIdentifier()
             .accounts({
@@ -66,21 +62,14 @@ describe("superteam-dao-contract", () => {
 
 
         // Create our Token A Mint
-        mintA = await Token.createMint(
-            provider.connection,
-            payer,
-            payer.publicKey,
-            null,
-            constants.MINT_A_DECIMALS,
-            TOKEN_PROGRAM_ID
-        );
+        mintA = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
 
-        [proposalAccount, proposalAccountBump] = await findPDAProposal(sender.publicKey, identifierData.count, program)
+        [applicantProposal, bump] = await findPDAProposal(sender.publicKey, identifierData.count, program)
 
         await program.methods.createProposal(recipient.publicKey, "https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png",
-            "Orca summer Winner", "", mintA.publicKey, "gamefi", new BN(100*(10**MINT_A_DECIMALS)), true)
+            "Orca summer Winner", "abc", mintA, "gamefi", new BN(100*(10**MINT_A_DECIMALS)), true, "")
             .accounts({
-                proposal: proposalAccount,
+                proposal: applicantProposal,
                 identifier: identifierAccount,
                 sender: sender.publicKey,
                 systemProgram: SystemProgram.programId,
@@ -89,17 +78,17 @@ describe("superteam-dao-contract", () => {
             .signers([sender])
             .rpc();
 
-        const dataProposal = await program.account.proposal.fetch(proposalAccount);
-        console.log("[proposal account] Create result: ", dataProposal);
+        const dataApplicantProposal = await program.account.proposal.fetch(applicantProposal);
+        console.log("[proposal account] Create result: ", dataApplicantProposal);
 
         identifierData = await program.account.identifier.fetch(identifierAccount);
 
-        [proposalAccount1, proposalAccountBump1] = await findPDAProposal(sender.publicKey, identifierData.count, program)
+        [applicantProposal1, bump] = await findPDAProposal(sender.publicKey, identifierData.count, program)
 
         await program.methods.createProposal(recipient.publicKey, "https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png",
-            "Orca summer 2nd", "", mintA.publicKey, "defi", new BN(100*(10**MINT_A_DECIMALS)), true)
+            "Orca summer 2nd", "", mintA, "defi", new BN(100*(10**MINT_A_DECIMALS)), true, "")
             .accounts({
-                proposal: proposalAccount1,
+                proposal: applicantProposal1,
                 identifier: identifierAccount,
                 sender: sender.publicKey,
                 systemProgram: SystemProgram.programId,
@@ -107,19 +96,15 @@ describe("superteam-dao-contract", () => {
             })
             .signers([sender])
             .rpc();
-
-        const dataProposal1 = await program.account.proposal.fetch(proposalAccount1);
-        console.log("[proposal account 1] Create result: ", dataProposal1);
-
 
         identifierData = await program.account.identifier.fetch(identifierAccount);
 
-        [proposalAccount2, proposalAccountBump2] = await findPDAProposal(sender.publicKey, identifierData.count, program)
+        [applicantProposal2, bump] = await findPDAProposal(sender.publicKey, identifierData.count, program)
 
         await program.methods.createProposal(recipient.publicKey, "https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png",
-            "Orca summer 3rd", "", mintA.publicKey, "orca", new BN(100*(10**MINT_A_DECIMALS)), true)
+            "Orca summer 3rd", "", mintA, "orca", new BN(100*(10**MINT_A_DECIMALS)), true, "")
             .accounts({
-                proposal: proposalAccount2,
+                proposal: applicantProposal2,
                 identifier: identifierAccount,
                 sender: sender.publicKey,
                 systemProgram: SystemProgram.programId,
@@ -127,20 +112,16 @@ describe("superteam-dao-contract", () => {
             })
             .signers([sender])
             .rpc();
-
-        const dataProposal2 = await program.account.proposal.fetch(proposalAccount2);
-        console.log("[proposal account 2] Create result: ", dataProposal2);
-        //
     });
 
-    it("cancel  proposal", async () => {
+    it("[Applicant flow] cancel  proposal", async () => {
         const balanceBefore = await provider.connection.getBalance(sender.publicKey);
         console.log("[sender balance before close proposal]: ", balanceBefore);
-        const balanceProposalAccount1 = await provider.connection.getBalance(proposalAccount1);
-        console.log("[proposalAccount 1 balance]: ", balanceProposalAccount1);
+        const balanceProposalAccount1 = await provider.connection.getBalance(applicantProposal1);
+        console.log("[applicantProposal1 balance]: ", balanceProposalAccount1);
         await program.methods.cancelProposal()
             .accounts({
-                proposal: proposalAccount1,
+                proposal: applicantProposal1,
                 sender: sender.publicKey,
                 systemProgram: SystemProgram.programId,
             })
@@ -152,25 +133,25 @@ describe("superteam-dao-contract", () => {
 
     });
 
-    it("reject  proposal", async () => {
+    it("[Applicant flow] reject  proposal", async () => {
         await program.methods.rejectProposal()
             .accounts({
-                proposal: proposalAccount2,
+                proposal: applicantProposal2,
                 recipient: recipient.publicKey,
                 systemProgram: SystemProgram.programId,
             })
             .signers([recipient])
             .rpc();
 
-        let proposalRejectData2= await program.account.proposal.fetch(proposalAccount2);
-        console.log("[proposal cancel account 2] Create result: ", proposalRejectData2);
+        let proposalRejectData2= await program.account.proposal.fetch(applicantProposal2);
+        console.log("[applicantProposal2] Create result: ", proposalRejectData2);
 
     });
 
-    it("approve  proposal", async () => {
-        await program.methods.approveProposal("")
+    it("[Applicant flow] approve  proposal", async () => {
+        await program.methods.approveProposal()
             .accounts({
-                proposal: proposalAccount,
+                proposal: applicantProposal,
                 recipient: recipient.publicKey,
                 systemProgram: SystemProgram.programId,
                 tokenProgram: TOKEN_PROGRAM_ID,
@@ -178,20 +159,64 @@ describe("superteam-dao-contract", () => {
             .signers([recipient])
             .rpc();
 
-        let proposalApproveData= await program.account.proposal.fetch(proposalAccount);
-        console.log("[proposal approve account] Create result: ", proposalApproveData);
+        let proposalApproveData= await program.account.proposal.fetch(applicantProposal);
+        console.log("[applicantProposal ] Create result: ", proposalApproveData);
     });
 
-    it("close cancel or reject  proposal", async () => {
+    it("[Applicant flow] applicant reject proposal", async () => {
+        await program.methods.applicantRejectProposal()
+            .accounts({
+                proposal: applicantProposal,
+                applicant: sender.publicKey,
+                systemProgram: SystemProgram.programId
+            })
+            .signers([sender])
+            .rpc();
+
+        let proposalApproveData= await program.account.proposal.fetch(applicantProposal);
+        console.log("[applicantProposal ] Create result: ", proposalApproveData);
+    });
+
+    it("[Applicant flow] approver fill transaction hash", async () => {
+        let trasactionHash = "32YZicRkcGKZ46ZPcW3FQ92nG5LDAgkuL1qYExL5HkF9MsKfGPhwXoCvvtQ1oCJ5yqeZCekjutcCZyeAoFhMRXQV"
+        await program.methods.fillTransactionHash(trasactionHash)
+            .accounts({
+                proposal: applicantProposal,
+                signer: recipient.publicKey,
+                systemProgram: SystemProgram.programId
+            })
+            .signers([recipient])
+            .rpc();
+
+        let proposalApproveData= await program.account.proposal.fetch(applicantProposal);
+        console.log("[applicantProposal ] Create result: ", proposalApproveData);
+    });
+
+    it("[Applicant flow] applicant approve proposal", async () => {
+        await program.methods.applicantConfirmProposal()
+            .accounts({
+                proposal: applicantProposal,
+                applicant: sender.publicKey,
+                systemProgram: SystemProgram.programId
+            })
+            .signers([sender])
+            .rpc();
+
+        let proposalApproveData= await program.account.proposal.fetch(applicantProposal);
+        console.log("[applicantProposal ] Create result: ", proposalApproveData);
+    });
+
+
+    it("[Applicant flow] close cancel or reject  proposal", async () => {
 
         const balanceBefore = await provider.connection.getBalance(sender.publicKey);
         console.log("[sender balance before close proposal]: ", balanceBefore);
-        const balanceProposalAccount2 = await provider.connection.getBalance(proposalAccount2);
+        const balanceProposalAccount2 = await provider.connection.getBalance(applicantProposal2);
         console.log("[proposalAccount 2 balance]: ", balanceProposalAccount2);
 
         await program.methods.closeProposal()
             .accounts({
-                proposal: proposalAccount2,
+                proposal: applicantProposal2,
                 sender: sender.publicKey,
                 systemProgram: SystemProgram.programId,
             })
@@ -204,40 +229,26 @@ describe("superteam-dao-contract", () => {
 
     });
 
-    it("filter proposal by sender ", async () => {
-        const connection = new Connection(clusterApiUrl('devnet'))
-        let programId = new PublicKey("2kAE3hehkVtyjfwBE9mMYgzMMD4uH6s6GLVwzuK179pV");
-        let sender = new PublicKey("3MdFxxJwwPUytxbLRBiNqmVHVwvG9t8qZs5Wo3SLRZVt");
-        const proposalsBySender = await connection.getProgramAccounts(programId, {
-            filters: [
-                { memcmp: { offset: 40, bytes: sender.toBase58() } }, // Ensure it's a CandyMachine account.
-            ],
-        });
-        const accountPublicKeys = proposalsBySender.map(account => account.pubkey)
-        const perPage = 6
-        const page1 = await getPage(1, perPage, accountPublicKeys, program)
-        console.log(page1)
 
-    });
-
-    it("filter proposal by recipient ", async () => {
-        let recipient = new PublicKey("AdjN2jSx9J6JekavLzmHuZxUMv1YuMqtkNsDYuRB82nG");
-        const proposalBySender = await program.account.proposal.all([
-            {
-                memcmp: {
-                    offset: 8, // Discriminator.
-                    bytes: recipient.toBase58(),
-                }
-            }
-        ]);
-
-        console.log(proposalBySender);
-
-    });
-
+    // it("filter proposal by sender ", async () => {
+    //     const connection = new Connection(clusterApiUrl('devnet'))
+    //     let programId = new PublicKey("2kAE3hehkVtyjfwBE9mMYgzMMD4uH6s6GLVwzuK179pV");
+    //     let sender = new PublicKey("3MdFxxJwwPUytxbLRBiNqmVHVwvG9t8qZs5Wo3SLRZVt");
+    //     const proposalsBySender = await connection.getProgramAccounts(programId, {
+    //         filters: [
+    //             { memcmp: { offset: 40, bytes: sender.toBase58() } }, // Ensure it's a CandyMachine account.
+    //         ],
+    //     });
+    //     const accountPublicKeys = proposalsBySender.map(account => account.pubkey)
+    //     const perPage = 6
+    //     const page1 = await getPage(1, perPage, accountPublicKeys, program)
+    //     console.log(page1)
+    //
+    // });
+    //
     // it("filter proposal by recipient ", async () => {
-    //     let recipient = new PublicKey("CsYj7vtRvE9ZaFghEQqA7JdaBxvPkeFWc2ucNuz8PoWU");
-    //     const proposalByRecipient = await program.account.proposal.all([
+    //     let recipient = new PublicKey("AdjN2jSx9J6JekavLzmHuZxUMv1YuMqtkNsDYuRB82nG");
+    //     const proposalBySender = await program.account.proposal.all([
     //         {
     //             memcmp: {
     //                 offset: 8, // Discriminator.
@@ -246,22 +257,7 @@ describe("superteam-dao-contract", () => {
     //         }
     //     ]);
     //
-    //     console.log(proposalByRecipient);
-    //
-    // });
-    //
-    // it("filter proposal by status ", async () => {
-    //     let status = new BN(1);
-    //     const proposalByStatus = await program.account.proposal.all([
-    //         {
-    //             memcmp: {
-    //                 offset: 74, // Discriminator.
-    //                 bytes: bs58.encode(status.toBuffer()),
-    //             }
-    //         }
-    //     ]);
-    //
-    //     console.log(proposalByStatus);
+    //     console.log(proposalBySender);
     //
     // });
 

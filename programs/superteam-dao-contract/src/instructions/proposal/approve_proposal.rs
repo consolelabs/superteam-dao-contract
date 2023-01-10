@@ -24,12 +24,15 @@ pub struct ApproveProposal<'info> {
 }
 
 pub fn handler(
-    ctx: Context<ApproveProposal>, transaction_hash: Option<String>
+    ctx: Context<ApproveProposal>
 ) -> Result<()> {
     let proposal = &mut ctx.accounts.proposal;
     if proposal.status == 0 {
         proposal.status = 2;
-        proposal.transaction = transaction_hash;
+        // approver submit grant with transaction hash, applicant approve and confirm
+        if !proposal.transaction.is_none() && proposal.owner == false {
+            proposal.pop_status = 1;
+        }
     }
     Ok(())
 }

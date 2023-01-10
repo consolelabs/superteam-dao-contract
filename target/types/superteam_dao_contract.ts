@@ -89,6 +89,12 @@ export type SuperteamDaoContract = {
         {
           "name": "isOwner",
           "type": "bool"
+        },
+        {
+          "name": "transactionHash",
+          "type": {
+            "option": "string"
+          }
         }
       ]
     },
@@ -158,14 +164,7 @@ export type SuperteamDaoContract = {
           "isSigner": false
         }
       ],
-      "args": [
-        {
-          "name": "transactionHash",
-          "type": {
-            "option": "string"
-          }
-        }
-      ]
+      "args": []
     },
     {
       "name": "closeProposal",
@@ -187,6 +186,76 @@ export type SuperteamDaoContract = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "applicantConfirmProposal",
+      "accounts": [
+        {
+          "name": "proposal",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "applicant",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "applicantRejectProposal",
+      "accounts": [
+        {
+          "name": "proposal",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "applicant",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "fillTransactionHash",
+      "accounts": [
+        {
+          "name": "proposal",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "transactionHash",
+          "type": {
+            "option": "string"
+          }
+        }
+      ]
     }
   ],
   "accounts": [
@@ -234,6 +303,10 @@ export type SuperteamDaoContract = {
           {
             "name": "amount",
             "type": "u64"
+          },
+          {
+            "name": "popStatus",
+            "type": "u8"
           },
           {
             "name": "tags",
@@ -330,6 +403,16 @@ export type SuperteamDaoContract = {
       "code": 6012,
       "name": "ImageTooLong",
       "msg": "The provided image should be 256 characters long maximum."
+    },
+    {
+      "code": 6013,
+      "name": "TransactionHashIsNotValid",
+      "msg": "The transaction hash is needed"
+    },
+    {
+      "code": 6014,
+      "name": "InvalidProposal",
+      "msg": "Proposal is invalid"
     }
   ]
 };
@@ -425,6 +508,12 @@ export const IDL: SuperteamDaoContract = {
         {
           "name": "isOwner",
           "type": "bool"
+        },
+        {
+          "name": "transactionHash",
+          "type": {
+            "option": "string"
+          }
         }
       ]
     },
@@ -494,14 +583,7 @@ export const IDL: SuperteamDaoContract = {
           "isSigner": false
         }
       ],
-      "args": [
-        {
-          "name": "transactionHash",
-          "type": {
-            "option": "string"
-          }
-        }
-      ]
+      "args": []
     },
     {
       "name": "closeProposal",
@@ -523,6 +605,76 @@ export const IDL: SuperteamDaoContract = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "applicantConfirmProposal",
+      "accounts": [
+        {
+          "name": "proposal",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "applicant",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "applicantRejectProposal",
+      "accounts": [
+        {
+          "name": "proposal",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "applicant",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "fillTransactionHash",
+      "accounts": [
+        {
+          "name": "proposal",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "transactionHash",
+          "type": {
+            "option": "string"
+          }
+        }
+      ]
     }
   ],
   "accounts": [
@@ -570,6 +722,10 @@ export const IDL: SuperteamDaoContract = {
           {
             "name": "amount",
             "type": "u64"
+          },
+          {
+            "name": "popStatus",
+            "type": "u8"
           },
           {
             "name": "tags",
@@ -666,6 +822,16 @@ export const IDL: SuperteamDaoContract = {
       "code": 6012,
       "name": "ImageTooLong",
       "msg": "The provided image should be 256 characters long maximum."
+    },
+    {
+      "code": 6013,
+      "name": "TransactionHashIsNotValid",
+      "msg": "The transaction hash is needed"
+    },
+    {
+      "code": 6014,
+      "name": "InvalidProposal",
+      "msg": "Proposal is invalid"
     }
   ]
 };

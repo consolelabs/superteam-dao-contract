@@ -41,4 +41,10 @@ pub enum ErrorCodes {
 
     #[msg("The provided image should be 256 characters long maximum.")]
     ImageTooLong,
+
+    #[msg("The transaction hash is needed")]
+    TransactionHashIsNotValid,
+
+    #[msg("Proposal is invalid")]
+    InvalidProposal,
 }
