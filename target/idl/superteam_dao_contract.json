@@ -414,5 +414,8 @@
       "name": "InvalidProposal",
       "msg": "Proposal is invalid"
     }
-  ]
+  ],
+  "metadata": {
+    "address": "2kAE3hehkVtyjfwBE9mMYgzMMD4uH6s6GLVwzuK179pV"
+  }
 }
