@@ -19,8 +19,7 @@ pub struct ApproveProposal<'info> {
     #[account(mut)]
     pub recipient: Signer<'info>,
 
-    pub system_program: Program<'info, System>,
-    pub token_program: Program<'info, Token>,
+    pub system_program: Program<'info, System>
 }
 
 pub fn handler(

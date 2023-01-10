@@ -155,7 +155,6 @@ describe("superteam-dao-contract", () => {
                 proposal: applicantProposal,
                 recipient: recipient.publicKey,
                 systemProgram: SystemProgram.programId,
-                tokenProgram: TOKEN_PROGRAM_ID,
             })
             .signers([recipient])
             .rpc();
@@ -288,7 +287,7 @@ describe("superteam-dao-contract", () => {
 
         [approverProposal2, bump] = await findPDAProposal(recipient.publicKey, identifierData2.count, program)
 
-        await program.methods.createProposal(recipient.publicKey, "https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png",
+        await program.methods.createProposal(sender.publicKey, "https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png",
             "Global 3rd", "", mintA, "payment", new BN(100*(10**MINT_A_DECIMALS)), false, null)
             .accounts({
                 proposal: approverProposal2,
@@ -307,13 +306,26 @@ describe("superteam-dao-contract", () => {
                 proposal: approverProposal1,
                 recipient: sender.publicKey,
                 systemProgram: SystemProgram.programId,
-                tokenProgram: TOKEN_PROGRAM_ID,
             })
             .signers([sender])
             .rpc();
 
         let proposalApproveAndConfirmData= await program.account.proposal.fetch(approverProposal1);
         console.log("[approver proposal ] Create result: ", proposalApproveAndConfirmData);
+    });
+
+    it("[Approver flow] reject proposal", async () => {
+        await program.methods.rejectProposal()
+            .accounts({
+                proposal: approverProposal2,
+                recipient: sender.publicKey,
+                systemProgram: SystemProgram.programId,
+            })
+            .signers([sender])
+            .rpc();
+
+        let proposalRejectData= await program.account.proposal.fetch(approverProposal2);
+        console.log("[approver proposal ] Create result: ", proposalRejectData);
     });
 
     // it("filter proposal by sender ", async () => {
