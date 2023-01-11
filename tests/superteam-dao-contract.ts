@@ -328,35 +328,35 @@ describe("superteam-dao-contract", () => {
         console.log("[approver proposal ] Create result: ", proposalRejectData);
     });
 
-    // it("filter proposal by sender ", async () => {
-    //     const connection = new Connection(clusterApiUrl('devnet'))
-    //     let programId = new PublicKey("2kAE3hehkVtyjfwBE9mMYgzMMD4uH6s6GLVwzuK179pV");
-    //     let sender = new PublicKey("3MdFxxJwwPUytxbLRBiNqmVHVwvG9t8qZs5Wo3SLRZVt");
-    //     const proposalsBySender = await connection.getProgramAccounts(programId, {
-    //         filters: [
-    //             { memcmp: { offset: 40, bytes: sender.toBase58() } }, // Ensure it's a CandyMachine account.
-    //         ],
-    //     });
-    //     const accountPublicKeys = proposalsBySender.map(account => account.pubkey)
-    //     const perPage = 6
-    //     const page1 = await getPage(1, perPage, accountPublicKeys, program)
-    //     console.log(page1)
-    //
-    // });
-    //
-    // it("filter proposal by recipient ", async () => {
-    //     let recipient = new PublicKey("AdjN2jSx9J6JekavLzmHuZxUMv1YuMqtkNsDYuRB82nG");
-    //     const proposalBySender = await program.account.proposal.all([
-    //         {
-    //             memcmp: {
-    //                 offset: 8, // Discriminator.
-    //                 bytes: recipient.toBase58(),
-    //             }
-    //         }
-    //     ]);
-    //
-    //     console.log(proposalBySender);
-    //
-    // });
+    it("filter proposal by sender ", async () => {
+        const connection = new Connection(clusterApiUrl('devnet'))
+        let programId = new PublicKey("2kAE3hehkVtyjfwBE9mMYgzMMD4uH6s6GLVwzuK179pV");
+        let sender = new PublicKey("DbkRkU7N21CHaPPBHvDhCpt3DpHjSqesiQFY84ebGneL");
+        const proposalsBySender = await connection.getProgramAccounts(programId, {
+            filters: [
+                { memcmp: { offset: 40, bytes: sender.toBase58() } }, // Ensure it's a CandyMachine account.
+            ],
+        });
+        const accountPublicKeys = proposalsBySender.map(account => account.pubkey)
+        const perPage = 6
+        const page1 = await getPage(1, perPage, accountPublicKeys, program)
+        console.log(page1)
+
+    });
+
+    it("get all proposal ", async () => {
+        let recipient = new PublicKey("AdjN2jSx9J6JekavLzmHuZxUMv1YuMqtkNsDYuRB82nG");
+        const proposalBySender = await program.account.proposal.all([
+            // {
+            //     memcmp: {
+            //         offset: 8, // Discriminator.
+            //         bytes: recipient.toBase58(),
+            //     }
+            // }
+        ]);
+
+        console.log(proposalBySender);
+
+    });
 
 });
