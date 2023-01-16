@@ -344,19 +344,11 @@ describe("superteam-dao-contract", () => {
 
     });
 
-    it("get all proposal ", async () => {
-        let recipient = new PublicKey("AdjN2jSx9J6JekavLzmHuZxUMv1YuMqtkNsDYuRB82nG");
-        const proposalBySender = await program.account.proposal.all([
-            // {
-            //     memcmp: {
-            //         offset: 8, // Discriminator.
-            //         bytes: recipient.toBase58(),
-            //     }
-            // }
-        ]);
-
-        console.log(proposalBySender);
-
-    });
+    // it("get all proposal ", async () => {
+    //     const proposalBySender = await program.account.proposal.fetch(new PublicKey("3qvdBecPWS5W3T6fNojJXSS2fS4yx2SrPntbE8TJVVBb"));
+    //
+    //     console.log(proposalBySender);
+    //
+    // });
 
 });
