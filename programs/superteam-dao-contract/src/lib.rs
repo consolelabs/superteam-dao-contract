@@ -21,9 +21,29 @@ pub mod superteam_dao_contract {
         Ok(())
     }
 
-    pub fn create_proposal(ctx: Context<CreateProposal>, recipient: Pubkey, image: String, title: String, subtitle: String,
-                           spl: Pubkey, tags: String, amount: u64, is_owner: bool, transaction_hash: Option<String>) -> Result<()> {
-        create_proposal::handler(ctx, recipient, image, title, subtitle, spl, tags, amount, is_owner, transaction_hash);
+    pub fn create_proposal(ctx: Context<CreateProposal>, receiver: Pubkey, sender: Pubkey, image: String, title: String, subtitle: String,
+                           spl: Pubkey, tags: String, amount: u64, is_owner: bool, transaction_hash: String) -> Result<()> {
+        create_proposal::handler(ctx, receiver, sender, image, title, subtitle, spl, tags, amount, is_owner, transaction_hash);
+        Ok(())
+    }
+
+    pub fn sender_approve_proposal(ctx: Context<SenderApproveProposal>) -> Result<()> {
+        sender_approve_proposal::handler(ctx);
+        Ok(())
+    }
+
+    pub fn receiver_approve_proposal(ctx: Context<ReceiverApproveProposal>) -> Result<()> {
+        receiver_approve_proposal::handler(ctx);
+        Ok(())
+    }
+
+    pub fn sender_reject_proposal(ctx: Context<SenderRejectProposal>) -> Result<()> {
+        sender_reject_proposal::handler(ctx);
+        Ok(())
+    }
+
+    pub fn receiver_reject_proposal(ctx: Context<ReceiverRejectProposal>) -> Result<()> {
+        receiver_reject_proposal::handler(ctx);
         Ok(())
     }
 
@@ -32,34 +52,10 @@ pub mod superteam_dao_contract {
         Ok(())
     }
 
-    pub fn reject_proposal(ctx: Context<RejectProposal>) -> Result<()> {
-        reject_proposal::handler(ctx);
-        Ok(())
-    }
-
-    pub fn approve_proposal(ctx: Context<ApproveProposal>) -> Result<()> {
-        approve_proposal::handler(ctx);
-        Ok(())
-    }
-
     pub fn close_proposal(ctx: Context<CloseProposal>) -> Result<()> {
         close_proposal::handler(ctx);
         Ok(())
     }
 
-    pub fn applicant_confirm_proposal(ctx: Context<ApplicantConfirmProposal>) -> Result<()> {
-        applicant_confirm_proposal::handler(ctx);
-        Ok(())
-    }
-
-    pub fn applicant_reject_proposal(ctx: Context<ApplicantRejectProposal>) -> Result<()> {
-        applicant_reject_proposal::handler(ctx);
-        Ok(())
-    }
-
-    pub fn fill_transaction_hash(ctx: Context<FillTransactionHash>, transaction_hash: Option<String>) -> Result<()> {
-        fill_transaction_hash::handler(ctx, transaction_hash);
-        Ok(())
-    }
 
 }

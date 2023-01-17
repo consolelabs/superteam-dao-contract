@@ -1,5 +1,3 @@
-use anchor_lang::AccountsClose;
-use anchor_lang::error::Error::ProgramError;
 use anchor_lang::prelude::*;
 
 use crate::constants::*;
@@ -11,24 +9,22 @@ use crate::schemas::Proposal;
 pub struct CloseProposal<'info> {
     #[account(
         mut,
-        constraint = *sender.key == proposal.sender
-        @ ErrorCodes::SenderInvalidStateAccount
+        seeds = [b"v1", PROPOSAL_SEED.as_ref(), payer.key().as_ref(), proposal.identifier.to_le_bytes().as_ref()],
+        bump
     )]
     pub proposal: Account<'info, Proposal>,
 
     #[account(mut)]
-    pub sender: Signer<'info>,
+    pub payer: Signer<'info>,
     pub system_program: Program<'info, System>,
 }
 
 pub fn handler(
     ctx: Context<CloseProposal>,
 ) -> Result<()> {
-    let proposal = & ctx.accounts.proposal;
-    if proposal.status == 3{
-        proposal.close(ctx.accounts.sender.to_account_info())?
+    let proposal = &mut ctx.accounts.proposal;
+    if proposal.sender_status == 2 || proposal.receiver_status == 2{
+        proposal.close(ctx.accounts.payer.to_account_info())?
     }
     Ok(())
 }
-
-

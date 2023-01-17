@@ -8,15 +8,15 @@ use crate::error::*;
 pub struct CreateIdentifier<'info> {
     #[account(
         init,
-        seeds = [b"v1", IDENTIFIER_SEED.as_ref(), sender.key().as_ref()],
+        seeds = [b"v1", IDENTIFIER_SEED.as_ref(), payer.key().as_ref()],
         bump,
         space = Identifier::space(),
-        payer = sender
+        payer = payer
     )]
     pub identifier: Account<'info, Identifier>,
 
     #[account(mut)]
-    pub sender: Signer<'info>,
+    pub payer: Signer<'info>,
 
     pub system_program: Program<'info, System>,
     pub rent: Sysvar<'info, Rent>,
@@ -26,7 +26,7 @@ pub fn handler(
     ctx: Context<CreateIdentifier>
 ) -> Result<()> {
     let identifier = &mut ctx.accounts.identifier;
-    identifier.sender = ctx.accounts.sender.key();
+    identifier.payer = ctx.accounts.payer.key();
     identifier.count = 0;
     Ok(())
 }

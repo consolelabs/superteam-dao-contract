@@ -6,25 +6,25 @@ use crate::schemas::Proposal;
 
 
 #[derive(Accounts)]
-pub struct RejectProposal<'info> {
+pub struct ReceiverApproveProposal<'info> {
     #[account(
         mut,
-        constraint = *recipient.key == proposal.recipient
-        @ ErrorCodes::RecipientInvalidStateAccount
+        constraint = *receiver.key == proposal.receiver
+        @ ErrorCodes::ReceiverInvalidStateAccount
     )]
     pub proposal: Account<'info, Proposal>,
 
     #[account(mut)]
-    pub recipient: Signer<'info>,
+    pub receiver: Signer<'info>,
     pub system_program: Program<'info, System>,
 }
 
 pub fn handler(
-    ctx: Context<RejectProposal>,
+    ctx: Context<ReceiverApproveProposal>,
 ) -> Result<()> {
     let proposal = &mut ctx.accounts.proposal;
-    if proposal.status == 0 {
-        proposal.status = 3;
+    if proposal.receiver_status == 0  {
+        proposal.receiver_status = 1;
     }
     Ok(())
 }

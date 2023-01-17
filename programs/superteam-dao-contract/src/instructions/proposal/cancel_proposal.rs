@@ -9,14 +9,13 @@ use crate::schemas::Proposal;
 pub struct CancelProposal<'info> {
     #[account(
         mut,
-        constraint = *sender.key == proposal.sender
-        @ ErrorCodes::SenderInvalidStateAccount,
-        close = sender
+        seeds = [b"v1", PROPOSAL_SEED.as_ref(), payer.key().as_ref(), proposal.identifier.to_le_bytes().as_ref()],
+        bump
     )]
     pub proposal: Account<'info, Proposal>,
 
     #[account(mut)]
-    pub sender: Signer<'info>,
+    pub payer: Signer<'info>,
     pub system_program: Program<'info, System>,
 }
 
@@ -24,10 +23,8 @@ pub fn handler(
     ctx: Context<CancelProposal>,
 ) -> Result<()> {
     let proposal = &mut ctx.accounts.proposal;
-    if proposal.status == 0 {
-        proposal.status = 1;
+    if proposal.sender_status == 0 && proposal.receiver_status == 0 {
+        proposal.close(ctx.accounts.payer.to_account_info())?
     }
     Ok(())
 }
-
-

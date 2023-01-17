@@ -27,328 +27,219 @@ describe("superteam-dao-contract", () => {
 
     const airdropSolAmount = 2;
 
+    let payer = anchor.web3.Keypair.generate();
     let sender = anchor.web3.Keypair.generate();
-    let recipient = anchor.web3.Keypair.generate();
+    let receiver = anchor.web3.Keypair.generate();
     let identifierAccount, applicantProposal, applicantProposal1, applicantProposal2 : anchor.web3.PublicKey;
     let identifierAccount2, approverProposal, approverProposal1, approverProposal2 : anchor.web3.PublicKey;
     let bump: number;
     let mintA;
     const delay = ms => new Promise(res => setTimeout(res, ms));
 
-    before("Boilerplates", async () => {
-
-        await delay(1000*5);
-        await airdrop(provider, sender.publicKey, airdropSolAmount)
-        await delay(1000*5);
-        await airdrop(provider, recipient.publicKey, airdropSolAmount)
-
-    });
-
-    it("[Applicant flow] initialize identifier and proposal", async () => {
-
-        [identifierAccount] = await findPDAIdentifier(sender.publicKey, program)
-
-        await program.methods.createIdentifier()
-            .accounts({
-                identifier: identifierAccount,
-                sender: sender.publicKey,
-                systemProgram: SystemProgram.programId,
-                rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-            })
-            .signers([sender])
-            .rpc();
-
-        let identifierData = await program.account.identifier.fetch(identifierAccount);
-        console.log("[identifier account] Create result: ", identifierData);
-
-
-        // Create our Token A Mint
-        mintA = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
-
-        [applicantProposal, bump] = await findPDAProposal(sender.publicKey, identifierData.count, program)
-
-        await program.methods.createProposal(recipient.publicKey, "https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png",
-            "Orca summer Winner", "abc", mintA, "gamefi", new BN(100*(10**MINT_A_DECIMALS)), true, null)
-            .accounts({
-                proposal: applicantProposal,
-                identifier: identifierAccount,
-                sender: sender.publicKey,
-                systemProgram: SystemProgram.programId,
-                rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-            })
-            .signers([sender])
-            .rpc();
-
-        const dataApplicantProposal = await program.account.proposal.fetch(applicantProposal);
-        console.log("[proposal account] Create result: ", dataApplicantProposal);
-
-        identifierData = await program.account.identifier.fetch(identifierAccount);
-
-        [applicantProposal1, bump] = await findPDAProposal(sender.publicKey, identifierData.count, program)
-
-        await program.methods.createProposal(recipient.publicKey, "https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png",
-            "Orca summer 2nd", "", mintA, "defi", new BN(100*(10**MINT_A_DECIMALS)), true, null)
-            .accounts({
-                proposal: applicantProposal1,
-                identifier: identifierAccount,
-                sender: sender.publicKey,
-                systemProgram: SystemProgram.programId,
-                rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-            })
-            .signers([sender])
-            .rpc();
-
-        identifierData = await program.account.identifier.fetch(identifierAccount);
-
-        [applicantProposal2, bump] = await findPDAProposal(sender.publicKey, identifierData.count, program)
-
-        await program.methods.createProposal(recipient.publicKey, "https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png",
-            "Orca summer 3rd", "", mintA, "orca", new BN(100*(10**MINT_A_DECIMALS)), true, null)
-            .accounts({
-                proposal: applicantProposal2,
-                identifier: identifierAccount,
-                sender: sender.publicKey,
-                systemProgram: SystemProgram.programId,
-                rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-            })
-            .signers([sender])
-            .rpc();
-    });
-
-    it("[Applicant flow] cancel  proposal", async () => {
-        const balanceBefore = await provider.connection.getBalance(sender.publicKey);
-        console.log("[sender balance before close proposal]: ", balanceBefore);
-        const balanceProposalAccount1 = await provider.connection.getBalance(applicantProposal1);
-        console.log("[applicantProposal1 balance]: ", balanceProposalAccount1);
-        await program.methods.cancelProposal()
-            .accounts({
-                proposal: applicantProposal1,
-                sender: sender.publicKey,
-                systemProgram: SystemProgram.programId,
-            })
-            .signers([sender])
-            .rpc();
-
-        const balanceAfter = await provider.connection.getBalance(sender.publicKey);
-        console.log("[sender balance after close proposal]: ", balanceAfter);
-
-    });
-
-    it("[Applicant flow] reject  proposal", async () => {
-        await program.methods.rejectProposal()
-            .accounts({
-                proposal: applicantProposal2,
-                recipient: recipient.publicKey,
-                systemProgram: SystemProgram.programId,
-            })
-            .signers([recipient])
-            .rpc();
-
-        let proposalRejectData2= await program.account.proposal.fetch(applicantProposal2);
-        console.log("[applicantProposal2] Create result: ", proposalRejectData2);
-
-    });
-
-    it("[Applicant flow] approve  proposal", async () => {
-        await program.methods.approveProposal()
-            .accounts({
-                proposal: applicantProposal,
-                recipient: recipient.publicKey,
-                systemProgram: SystemProgram.programId,
-            })
-            .signers([recipient])
-            .rpc();
-
-        let proposalApproveData= await program.account.proposal.fetch(applicantProposal);
-        console.log("[applicantProposal ] Create result: ", proposalApproveData);
-    });
-
-    it("[Applicant flow] applicant reject proposal", async () => {
-        await delay(1000*2);
-        await program.methods.applicantRejectProposal()
-            .accounts({
-                proposal: applicantProposal,
-                applicant: sender.publicKey,
-                systemProgram: SystemProgram.programId
-            })
-            .signers([sender])
-            .rpc();
-
-        let proposalApproveData= await program.account.proposal.fetch(applicantProposal);
-        console.log("[applicantProposal ] Create result: ", proposalApproveData);
-    });
-
-    it("[Applicant flow] approver fill transaction hash", async () => {
-        let trasactionHash = "32YZicRkcGKZ46ZPcW3FQ92nG5LDAgkuL1qYExL5HkF9MsKfGPhwXoCvvtQ1oCJ5yqeZCekjutcCZyeAoFhMRXQV"
-        await program.methods.fillTransactionHash(trasactionHash)
-            .accounts({
-                proposal: applicantProposal,
-                signer: recipient.publicKey,
-                systemProgram: SystemProgram.programId
-            })
-            .signers([recipient])
-            .rpc();
-
-        let proposalApproveData= await program.account.proposal.fetch(applicantProposal);
-        console.log("[applicantProposal ] Create result: ", proposalApproveData);
-    });
-
-    it("[Applicant flow] applicant approve proposal", async () => {
-        await program.methods.applicantConfirmProposal()
-            .accounts({
-                proposal: applicantProposal,
-                applicant: sender.publicKey,
-                systemProgram: SystemProgram.programId
-            })
-            .signers([sender])
-            .rpc();
-
-        let proposalApproveData= await program.account.proposal.fetch(applicantProposal);
-        console.log("[applicantProposal ] Create result: ", proposalApproveData);
-    });
-
-    it("[Applicant flow] close reject  proposal", async () => {
-
-        const balanceBefore = await provider.connection.getBalance(sender.publicKey);
-        console.log("[sender balance before close proposal]: ", balanceBefore);
-        const balanceProposalAccount2 = await provider.connection.getBalance(applicantProposal2);
-        console.log("[proposalAccount 2 balance]: ", balanceProposalAccount2);
-
-        await program.methods.closeProposal()
-            .accounts({
-                proposal: applicantProposal2,
-                sender: sender.publicKey,
-                systemProgram: SystemProgram.programId,
-            })
-            .signers([sender])
-            .rpc();
-
-
-        const balanceAfter = await provider.connection.getBalance(sender.publicKey);
-        console.log("[sender balance after close proposal]: ", balanceAfter);
-
-    });
-
-    it("[Approver flow] initialize identifier and proposal", async () => {
-
-        [identifierAccount2] = await findPDAIdentifier(recipient.publicKey, program)
-
-        await program.methods.createIdentifier()
-            .accounts({
-                identifier: identifierAccount2,
-                sender: recipient.publicKey,
-                systemProgram: SystemProgram.programId,
-                rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-            })
-            .signers([recipient])
-            .rpc();
-
-        let identifierData2 = await program.account.identifier.fetch(identifierAccount2);
-        console.log("[identifier account] Create result: ", identifierData2);
-
-
-        // Create our Token A Mint
-        mintA = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
-
-        [approverProposal, bump] = await findPDAProposal(recipient.publicKey, identifierData2.count, program)
-
-        await program.methods.createProposal(sender.publicKey, "https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png",
-            "Global Winner", "abc", mintA, "defi", new BN(100*(10**MINT_A_DECIMALS)), false, null)
-            .accounts({
-                proposal: approverProposal,
-                identifier: identifierAccount2,
-                sender: recipient.publicKey,
-                systemProgram: SystemProgram.programId,
-                rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-            })
-            .signers([recipient])
-            .rpc();
-
-        const dataApproverProposal = await program.account.proposal.fetch(approverProposal);
-        console.log("[proposal account] Create result: ", dataApproverProposal);
-
-        identifierData2 = await program.account.identifier.fetch(identifierAccount2);
-
-        [approverProposal1, bump] = await findPDAProposal(recipient.publicKey, identifierData2.count, program)
-
-        await program.methods.createProposal(sender.publicKey, "https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png",
-            "Global 2nd", "", mintA, "gamefi", new BN(100*(10**MINT_A_DECIMALS)), false, "32YZicRkcGKZ46ZPcW3FQ92nG5LDAgkuL1qYExL5HkF9MsKfGPhwXoCvvtQ1oCJ5yqeZCekjutcCZyeAoFhMRXQV")
-            .accounts({
-                proposal: approverProposal1,
-                identifier: identifierAccount2,
-                sender: recipient.publicKey,
-                systemProgram: SystemProgram.programId,
-                rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-            })
-            .signers([recipient])
-            .rpc();
-
-        identifierData2 = await program.account.identifier.fetch(identifierAccount2);
-
-        [approverProposal2, bump] = await findPDAProposal(recipient.publicKey, identifierData2.count, program)
-
-        await program.methods.createProposal(sender.publicKey, "https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png",
-            "Global 3rd", "", mintA, "payment", new BN(100*(10**MINT_A_DECIMALS)), false, null)
-            .accounts({
-                proposal: approverProposal2,
-                identifier: identifierAccount2,
-                sender: recipient.publicKey,
-                systemProgram: SystemProgram.programId,
-                rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-            })
-            .signers([recipient])
-            .rpc();
-    });
-
-    it("[Approver flow] approve proposal and confirm proposal", async () => {
-        await program.methods.approveProposal()
-            .accounts({
-                proposal: approverProposal1,
-                recipient: sender.publicKey,
-                systemProgram: SystemProgram.programId,
-            })
-            .signers([sender])
-            .rpc();
-
-        let proposalApproveAndConfirmData= await program.account.proposal.fetch(approverProposal1);
-        console.log("[approver proposal ] Create result: ", proposalApproveAndConfirmData);
-    });
-
-    it("[Approver flow] reject proposal", async () => {
-        await program.methods.rejectProposal()
-            .accounts({
-                proposal: approverProposal2,
-                recipient: sender.publicKey,
-                systemProgram: SystemProgram.programId,
-            })
-            .signers([sender])
-            .rpc();
-
-        let proposalRejectData= await program.account.proposal.fetch(approverProposal2);
-        console.log("[approver proposal ] Create result: ", proposalRejectData);
-    });
-
-    it("filter proposal by sender ", async () => {
-        const connection = new Connection(clusterApiUrl('devnet'))
-        let programId = new PublicKey("2kAE3hehkVtyjfwBE9mMYgzMMD4uH6s6GLVwzuK179pV");
-        let sender = new PublicKey("DbkRkU7N21CHaPPBHvDhCpt3DpHjSqesiQFY84ebGneL");
-        const proposalsBySender = await connection.getProgramAccounts(programId, {
-            filters: [
-                { memcmp: { offset: 40, bytes: sender.toBase58() } }, // Ensure it's a CandyMachine account.
-            ],
-        });
-        const accountPublicKeys = proposalsBySender.map(account => account.pubkey)
-        const perPage = 6
-        const page1 = await getPage(1, perPage, accountPublicKeys, program)
-        console.log(page1)
-
-    });
-
-    // it("get all proposal ", async () => {
-    //     const proposalBySender = await program.account.proposal.fetch(new PublicKey("3qvdBecPWS5W3T6fNojJXSS2fS4yx2SrPntbE8TJVVBb"));
+    // before("Boilerplates", async () => {
+    //
+    //     await delay(1000*5);
+    //     await airdrop(provider, sender.publicKey, airdropSolAmount)
+    //     await delay(1000*5);
+    //     await airdrop(provider, payer.publicKey, airdropSolAmount)
+    //     await delay(1000*5);
+    //     await airdrop(provider, receiver.publicKey, airdropSolAmount)
+    //
+    // });
+    //
+    // it("[Applicant flow] initialize identifier and proposal", async () => {
+    //
+    //     [identifierAccount] = await findPDAIdentifier(payer.publicKey, program)
+    //
+    //     await program.methods.createIdentifier()
+    //         .accounts({
+    //             identifier: identifierAccount,
+    //             payer: payer.publicKey,
+    //             systemProgram: SystemProgram.programId,
+    //             rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+    //         })
+    //         .signers([payer])
+    //         .rpc();
+    //
+    //     let identifierData = await program.account.identifier.fetch(identifierAccount);
+    //     console.log("[identifier account] Create result: ", identifierData);
+    //
+    //
+    //     // Create our Token A Mint
+    //     mintA = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
+    //
+    //     [applicantProposal, bump] = await findPDAProposal(payer.publicKey, identifierData.count, program)
+    //
+    //     await program.methods.createProposal(receiver.publicKey, sender.publicKey, "https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png",
+    //         "Orca summer Winner", "abc", mintA, "gamefi", new BN(100*(10**MINT_A_DECIMALS)), true, "3danKMRy4oyf4mD7Sun3FtnHxQGsHyxJwxBzHN1CWzaRdK6vjwEUH6gv5yNN2Cp6SPnUxwSHYbuimkNyX2zm24bZ")
+    //         .accounts({
+    //             proposal: applicantProposal,
+    //             identifier: identifierAccount,
+    //             payer: payer.publicKey,
+    //             systemProgram: SystemProgram.programId,
+    //             rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+    //         })
+    //         .signers([payer])
+    //         .rpc();
+    //
+    //     const dataApplicantProposal = await program.account.proposal.fetch(applicantProposal);
+    //     console.log("[proposal account] Create result: ", dataApplicantProposal);
+    //
+    //     identifierData = await program.account.identifier.fetch(identifierAccount);
+    //
+    //     [applicantProposal1, bump] = await findPDAProposal(payer.publicKey, identifierData.count, program)
+    //
+    //     await program.methods.createProposal(receiver.publicKey, sender.publicKey, "https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png",
+    //         "Orca summer 2nd", "", mintA, "defi", new BN(100*(10**MINT_A_DECIMALS)), true, "3danKM5XYgcAwXRQm4DF5qqpuRUzKXEC1ieTiZyvsHDnojS2ayjaDgPYDF7rX1CQGTxWqhFo4bYZf7VuaJxh7e9Z9KNa9nRy4oyf4mD7Sun3FtnHxQGsHyxJwxBzHN1CWzaRdK6vjwEUH6gv5yNN2Cp6SPnUxwSHYbuimkNyX2zm24bZ")
+    //         .accounts({
+    //             proposal: applicantProposal1,
+    //             identifier: identifierAccount,
+    //             payer: payer.publicKey,
+    //             systemProgram: SystemProgram.programId,
+    //             rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+    //         })
+    //         .signers([payer])
+    //         .rpc();
+    //
+    //     identifierData = await program.account.identifier.fetch(identifierAccount);
+    //     [applicantProposal2, bump] = await findPDAProposal(payer.publicKey, identifierData.count, program)
+    //
+    //     await program.methods.createProposal(receiver.publicKey, sender.publicKey, "https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png",
+    //         "Solcan summer 3rd", "", mintA, "gamefi", new BN(100*(10**MINT_A_DECIMALS)), true, "65K56thKZjgD5VNwq4g2HYQYWz2qvTkoy2YXb5zssbHZm6RvPFDrP26xiFMKyLRV1dDv6mR44DENeDfL771QXZJK")
+    //         .accounts({
+    //             proposal: applicantProposal2,
+    //             identifier: identifierAccount,
+    //             payer: payer.publicKey,
+    //             systemProgram: SystemProgram.programId,
+    //             rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+    //         })
+    //         .signers([payer])
+    //         .rpc();
+    //
+    // });
+    //
+    // it("[sender] approve  proposal", async () => {
+    //     await program.methods.senderApproveProposal()
+    //         .accounts({
+    //             proposal: applicantProposal,
+    //             sender: sender.publicKey,
+    //             systemProgram: SystemProgram.programId,
+    //         })
+    //         .signers([sender])
+    //         .rpc();
+    //
+    //     const dataApplicantProposal = await program.account.proposal.fetch(applicantProposal);
+    //     console.log("[proposal account] sender approve : ", dataApplicantProposal);
+    // });
+    //
+    // it("[submitter] cancel  proposal", async () => {
+    //     const balanceBefore = await provider.connection.getBalance(payer.publicKey);
+    //     console.log("[payer balance before close proposal]: ", balanceBefore);
+    //     const balanceProposalAccount2 = await provider.connection.getBalance(applicantProposal2);
+    //     console.log("[applicantProposal2 balance]: ", balanceProposalAccount2);
+    //     await program.methods.cancelProposal()
+    //         .accounts({
+    //             proposal: applicantProposal2,
+    //             payer: payer.publicKey,
+    //             systemProgram: SystemProgram.programId,
+    //         })
+    //         .signers([payer])
+    //         .rpc();
+    //     const balanceAfter = await provider.connection.getBalance(payer.publicKey);
+    //     console.log("[payer balance after close proposal]: ", balanceAfter);
+    // });
+    //
+    // it("[sender] reject  proposal", async () => {
+    //     await program.methods.senderRejectProposal()
+    //         .accounts({
+    //             proposal: applicantProposal1,
+    //             sender: sender.publicKey,
+    //             systemProgram: SystemProgram.programId,
+    //         })
+    //         .signers([sender])
+    //         .rpc();
+    //
+    //     const dataApplicantProposal1 = await program.account.proposal.fetch(applicantProposal1);
+    //     console.log("[proposal account] sender approve : ", dataApplicantProposal1);
+    // });
+    //
+    // it("[submitter] close  proposal", async () => {
+    //     const balanceBefore = await provider.connection.getBalance(payer.publicKey);
+    //     console.log("[payer balance before close proposal]: ", balanceBefore);
+    //     const balanceProposalAccount1 = await provider.connection.getBalance(applicantProposal1);
+    //     console.log("[applicantProposal1 balance]: ", balanceProposalAccount1);
+    //     await program.methods.cancelProposal()
+    //     await program.methods.closeProposal()
+    //         .accounts({
+    //             proposal: applicantProposal1,
+    //             payer: payer.publicKey,
+    //             systemProgram: SystemProgram.programId,
+    //         })
+    //         .signers([payer])
+    //         .rpc();
+    //     const balanceAfter = await provider.connection.getBalance(payer.publicKey);
+    //     console.log("[payer balance after close proposal]: ", balanceAfter);
+    // });
+    //
+    // // it("filter proposal by sender ", async () => {
+    // //     const connection = new Connection(clusterApiUrl('devnet'))
+    // //     let programId = new PublicKey("2kAE3hehkVtyjfwBE9mMYgzMMD4uH6s6GLVwzuK179pV");
+    // //     let sender = new PublicKey("DbkRkU7N21CHaPPBHvDhCpt3DpHjSqesiQFY84ebGneL");
+    // //     const proposalsBySender = await connection.getProgramAccounts(programId, {
+    // //         filters: [
+    // //             { memcmp: { offset: 40, bytes: sender.toBase58() } }, // Ensure it's a CandyMachine account.
+    // //         ],
+    // //     });
+    // //     const accountPublicKeys = proposalsBySender.map(account => account.pubkey)
+    // //     const perPage = 6
+    // //     const page1 = await getPage(1, perPage, accountPublicKeys, program)
+    // //     console.log(page1)
+    // //
+    // // });
+    //
+    // it("get proposal by transaction, sender, receiver ", async () => {
+    //     let transaction = "3danKMRy4oyf4mD7Sun3FtnHxQGsHyxJwxBzHN1CWzaRdK6vjwEUH6gv5yNN2Cp6SPnUxwSHYbuimkNyX2zm24bZ"
+    //     const proposalBySender = await program.account.proposal.all([
+    //         {
+    //             memcmp: {
+    //                 offset: 8, // Discriminator.
+    //                 bytes: receiver.publicKey.toBase58(),
+    //             },
+    //         },
+    //         {
+    //             memcmp: {
+    //                 offset: 40, // Discriminator.
+    //                 bytes: sender.publicKey.toBase58(),
+    //             },
+    //         },
+    //         {
+    //             memcmp: {
+    //                 offset: 76, // Discriminator.
+    //                 bytes: bs58.encode(Buffer.from(transaction)),
+    //             },
+    //         }
+    //     ]);
     //
     //     console.log(proposalBySender);
     //
     // });
+
+    it("test pda ", async () => {
+       let transaction = "3danKMRy4oyf4mD7Sun3FtnHxQGsHyxJwxBzHN1CWzaRdK6vjwEUH6gv5yNN2Cp6SPnUxwSHYbuimkNyX2zm24bZ"
+       let firstTxn = transaction.substring(0, 31)
+       let secondTxn = transaction.substring(32, 63)
+       let [abc, bump] = await  PublicKey.findProgramAddress(
+            [
+                Buffer.from(firstTxn),
+                Buffer.from(secondTxn),
+                sender.publicKey.toBuffer(),
+                receiver.publicKey.toBuffer(),
+                ,
+            ],
+            program.programId
+        );
+        console.log(abc.toString())
+    })
+
 
 });

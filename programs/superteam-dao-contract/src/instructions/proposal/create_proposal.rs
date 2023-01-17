@@ -8,23 +8,23 @@ use crate::error::*;
 pub struct CreateProposal<'info> {
     #[account(
         init,
-        seeds = [b"v1", PROPOSAL_SEED.as_ref(), sender.key().as_ref(), identifier.count.to_le_bytes().as_ref()],
+        seeds = [b"v1", PROPOSAL_SEED.as_ref(), payer.key().as_ref(), identifier.count.to_le_bytes().as_ref()],
         bump,
         space = Proposal::space(),
-        payer = sender
+        payer = payer
     )]
     pub proposal: Account<'info, Proposal>,
 
     #[account(
         mut,
-        seeds = [b"v1", IDENTIFIER_SEED.as_ref(), sender.key().as_ref()],
+        seeds = [b"v1", IDENTIFIER_SEED.as_ref(), payer.key().as_ref()],
         bump,
-        has_one = sender
+        has_one = payer
     )]
     pub identifier: Account<'info, Identifier>,
 
     #[account(mut)]
-    pub sender: Signer<'info>,
+    pub payer: Signer<'info>,
 
     pub system_program: Program<'info, System>,
     pub rent: Sysvar<'info, Rent>,
@@ -33,8 +33,8 @@ pub struct CreateProposal<'info> {
 
 pub fn handler(
     ctx: Context<CreateProposal>,
-    recipient: Pubkey, image: String, title: String, subtitle: String,
-    spl: Pubkey, tags: String, amount: u64, is_owner: bool, transaction_hash: Option<String>
+    receiver: Pubkey, sender: Pubkey, image: String, title: String, subtitle: String,
+    spl: Pubkey, tags: String, amount: u64, is_owner: bool, transaction_hash: String
 ) -> Result<()> {
     let identifier = &mut ctx.accounts.identifier;
     let proposal = &mut ctx.accounts.proposal;
@@ -55,19 +55,17 @@ pub fn handler(
         return Err(ErrorCodes::TagsTooLong.into())
     }
 
-
-    proposal.recipient = recipient;
-    proposal.sender = ctx.accounts.sender.key();
+    proposal.receiver = receiver;
+    proposal.sender = sender;
     proposal.image = image;
     proposal.title = title;
     proposal.subtitle = subtitle;
     proposal.spl = spl;
     proposal.amount = amount;
     proposal.tags = tags;
-    proposal.owner = is_owner;
     proposal.identifier = identifier.count;
-    proposal.status = 0;
-    proposal.pop_status = 0;
+    proposal.sender_status = 0;
+    proposal.receiver_status = 0;
     proposal.transaction = transaction_hash;
 
     identifier.count += 1;
