@@ -9,8 +9,8 @@ use crate::schemas::Proposal;
 pub struct CloseProposal<'info> {
     #[account(
         mut,
-        seeds = [b"v1", PROPOSAL_SEED.as_ref(), payer.key().as_ref(), proposal.identifier.to_le_bytes().as_ref()],
-        bump
+        constraint = *payer.key == proposal.submitter
+        @ ErrorCodes::InvalidAccount
     )]
     pub proposal: Account<'info, Proposal>,
 

@@ -12,4 +12,4 @@ pub const MAX_LENGTH_TITLE: usize = 256;
 pub const MAX_LENGTH_IMAGE: usize = 256;
 pub const MAX_LENGTH_SUBTITLE: usize = 256;
 pub const MAX_LENGTH_TAGS: usize = 256;
-pub const LENGTH_TRANSACTION_HASH: usize = 64;
+pub const LENGTH_TRANSACTION_HASH: usize = 88;

@@ -5,23 +5,16 @@ use crate::constants::*;
 use crate::error::*;
 
 #[derive(Accounts)]
+#[instruction(first_txn: String, second_txn: String, third_txn: String, sender: Pubkey, receiver: Pubkey)]
 pub struct CreateProposal<'info> {
     #[account(
         init,
-        seeds = [b"v1", PROPOSAL_SEED.as_ref(), payer.key().as_ref(), identifier.count.to_le_bytes().as_ref()],
+        seeds = [PROPOSAL_SEED.as_ref(), first_txn.as_bytes(), second_txn.as_bytes(), third_txn.as_bytes(), sender.as_ref(), receiver.as_ref()],
         bump,
         space = Proposal::space(),
         payer = payer
     )]
     pub proposal: Account<'info, Proposal>,
-
-    #[account(
-        mut,
-        seeds = [b"v1", IDENTIFIER_SEED.as_ref(), payer.key().as_ref()],
-        bump,
-        has_one = payer
-    )]
-    pub identifier: Account<'info, Identifier>,
 
     #[account(mut)]
     pub payer: Signer<'info>,
@@ -33,10 +26,10 @@ pub struct CreateProposal<'info> {
 
 pub fn handler(
     ctx: Context<CreateProposal>,
-    receiver: Pubkey, sender: Pubkey, image: String, title: String, subtitle: String,
-    spl: Pubkey, tags: String, amount: u64, is_owner: bool, transaction_hash: String
+    first_txn: String, second_txn: String, third_txn: String,
+    sender: Pubkey, receiver: Pubkey, image: String, title: String, subtitle: String,
+    spl: Pubkey, tags: String, amount: u64
 ) -> Result<()> {
-    let identifier = &mut ctx.accounts.identifier;
     let proposal = &mut ctx.accounts.proposal;
 
     if image.chars().count() > MAX_LENGTH_IMAGE {
@@ -63,12 +56,10 @@ pub fn handler(
     proposal.spl = spl;
     proposal.amount = amount;
     proposal.tags = tags;
-    proposal.identifier = identifier.count;
     proposal.sender_status = 0;
     proposal.receiver_status = 0;
-    proposal.transaction = transaction_hash;
-
-    identifier.count += 1;
+    proposal.transaction = format!("{}{}{}", first_txn, second_txn, third_txn);
+    proposal.submitter = ctx.accounts.payer.key();
 
     Ok(())
 }

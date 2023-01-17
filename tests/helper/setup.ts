@@ -16,13 +16,17 @@ export async function findPDAIdentifier(owner: PublicKey, program){
 
 }
 
-export async function findPDAProposal(owner: PublicKey, identifierCount: BN, program){
+export async function findPDAProposal(firstTransaction: String, secondTransaction: String, thirdTransaction: String,
+                                      sender: PublicKey, receiver: PublicKey, program){
     return await PublicKey.findProgramAddress(
         [
-            Buffer.from("v1"),
             Buffer.from(constants.proposalSeed),
-            owner.toBuffer(),
-            identifierCount.toArrayLike(Buffer, "le", 8)
+            Buffer.from(firstTransaction),
+            Buffer.from(secondTransaction),
+            Buffer.from(thirdTransaction),
+            sender.toBuffer(),
+            receiver.toBuffer()
+
         ],
         program.programId
     );
