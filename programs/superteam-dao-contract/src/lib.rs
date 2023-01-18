@@ -10,16 +10,11 @@ use crate::error::*;
 use instructions::*;
 use schemas::*;
 
-declare_id!("9J2QYZw4KgkL7W1uAf2awtqAc7roNWtcjVmAGs6GskRT");
+declare_id!("Acky1tFTVd3RDJGYdHeV7rjjP4i8ziQ1NH2CR5Cg7KsU");
 
 #[program]
 pub mod superteam_dao_contract {
     use super::*;
-
-    pub fn create_identifier(ctx: Context<CreateIdentifier>) -> Result<()> {
-        create_identifier::handler(ctx);
-        Ok(())
-    }
 
     pub fn create_proposal(ctx: Context<CreateProposal>, first_txn: String,
                            second_txn: String, third_txn: String,

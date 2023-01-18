@@ -37,7 +37,7 @@ describe("superteam-dao-contract", () => {
     const delay = ms => new Promise(res => setTimeout(res, ms));
 
     before("Boilerplates", async () => {
-        let secondDelay = 1;
+        let secondDelay = 5;
         await delay(1000*secondDelay);
         await airdrop(provider, sender.publicKey, airdropSolAmount)
         await delay(1000*secondDelay);
@@ -203,6 +203,48 @@ describe("superteam-dao-contract", () => {
         ]);
 
         console.log(proposalBySender);
+
+    });
+
+    it("get proposal by receiver ", async () => {
+        const proposal = await program.account.proposal.all([
+            {
+                memcmp: {
+                    offset: 8, // Discriminator.
+                    bytes: receiver.publicKey.toBase58(),
+                },
+            },
+        ]);
+
+        console.log(proposal);
+
+    });
+
+    it("get proposal by sender ", async () => {
+        const proposal = await program.account.proposal.all([
+            {
+                memcmp: {
+                    offset: 40, // Discriminator.
+                    bytes: sender.publicKey.toBase58(),
+                },
+            },
+        ]);
+
+        console.log(proposal);
+
+    });
+
+    it("get proposal by submitter ", async () => {
+        const proposal = await program.account.proposal.all([
+            {
+                memcmp: {
+                    offset: 164, // Discriminator.
+                    bytes: payer.publicKey.toBase58(),
+                },
+            },
+        ]);
+
+        console.log(proposal);
 
     });
 

@@ -9,9 +9,6 @@ pub enum ErrorCodes {
     #[msg("Invalid receiver")]
     ReceiverInvalidStateAccount,
 
-    #[msg("Invalid owner account")]
-    OwnerInvalidAccount,
-
     #[msg("Account is invalid")]
     InvalidAccount,
 

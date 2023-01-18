@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::schemas::{Identifier, Proposal};
+use crate::schemas::Proposal;
 use crate::constants::*;
 use crate::error::*;
 
