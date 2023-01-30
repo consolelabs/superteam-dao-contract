@@ -10,7 +10,7 @@ use crate::error::*;
 use instructions::*;
 use schemas::*;
 
-declare_id!("Acky1tFTVd3RDJGYdHeV7rjjP4i8ziQ1NH2CR5Cg7KsU");
+declare_id!("7cir3NiJkRvAHY5DFtnBWWDWXUMPjnJcVgwiQ9YBUS5o");
 
 #[program]
 pub mod superteam_dao_contract {

@@ -58,7 +58,7 @@ describe("superteam-dao-contract", () => {
         [applicantProposal, bump] = await findPDAProposal(txn.substring(0, 32), txn.substring(32, 64), txn.substring(64, 88), sender.publicKey, receiver.publicKey, program)
 
         await program.methods.createProposal(txn.substring(0, 32), txn.substring(32, 64), txn.substring(64, 88), sender.publicKey, receiver.publicKey, "https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png",
-            "Orca summer Winner", "abc", mintA, "gamefi", new BN(100*(10**MINT_A_DECIMALS)))
+            "Orca summer Winner", "The analogies and problems used in these experiments were not specific to any domain of expertise and used fantasy problems relying only on linguistic descriptions, The semantic descriptions of the devices were varied, but the pictures were identical for both conditions, The following descriptions focus on the local purge in each town and the points at which the local and legal purges diverged.", mintA, "gamefi", new BN(100*(10**MINT_A_DECIMALS)))
             .accounts({
                 proposal: applicantProposal,
                 payer: payer.publicKey,
@@ -154,10 +154,11 @@ describe("superteam-dao-contract", () => {
         await program.methods.closeProposal()
             .accounts({
                 proposal: applicantProposal1,
-                payer: payer.publicKey,
+                submitter: payer.publicKey,
+                payer: receiver.publicKey,
                 systemProgram: SystemProgram.programId,
             })
-            .signers([payer])
+            .signers([receiver])
             .rpc();
         const balanceAfter = await provider.connection.getBalance(payer.publicKey);
         console.log("[payer balance after close proposal]: ", balanceAfter);
@@ -196,7 +197,7 @@ describe("superteam-dao-contract", () => {
             },
             {
                 memcmp: {
-                    offset: 76, // Discriminator.
+                    offset: 118, // Discriminator.
                     bytes: bs58.encode(Buffer.from(transaction)),
                 },
             }
@@ -238,7 +239,7 @@ describe("superteam-dao-contract", () => {
         const proposal = await program.account.proposal.all([
             {
                 memcmp: {
-                    offset: 164, // Discriminator.
+                    offset: 72, // Discriminator.
                     bytes: payer.publicKey.toBase58(),
                 },
             },
@@ -247,6 +248,12 @@ describe("superteam-dao-contract", () => {
         console.log(proposal);
 
     });
+
+    // it("check proposal is exist", async () => {
+    //     let key = new PublicKey("B9zsa2U1qgYMnsxAr6dm96hJkiGHcxxcnZTNTwmTVJGN")
+    //     const proposal = await program.account.proposal.fetch(key)
+    //     console.log(proposal)
+    // })
 
 
 });
