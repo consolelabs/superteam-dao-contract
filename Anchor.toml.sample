@@ -2,9 +2,11 @@
 seeds = false
 skip-lint = false
 [programs.localnet]
-contract_tip_bot = "3J1FznG6CXjV9HqQrvfaxLtN4vqbkNdFu7Gr3G3yVH2g"
+superteam_dao_contract = "9fHpouSqNrqBKLka9WeUXkRuh2Qt97nvqtP1Km99LKXb"
+freeze_nft_contract = "CQamCKHdgid5vgpRvuc88GQCFXvifPUYRTUmpgv3bDuG"
 [programs.devnet]
-contract_tip_bot = "3J1FznG6CXjV9HqQrvfaxLtN4vqbkNdFu7Gr3G3yVH2g"
+superteam_dao_contract = "9fHpouSqNrqBKLka9WeUXkRuh2Qt97nvqtP1Km99LKXb"
+freeze_nft_contract = "CQamCKHdgid5vgpRvuc88GQCFXvifPUYRTUmpgv3bDuG"
 
 [registry]
 url = "https://api.apr.dev"
