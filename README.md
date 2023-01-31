@@ -1,4 +1,4 @@
-# contract-tip-bot
+# superteam-dao-contract
 
 # Quick Start
 
