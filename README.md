@@ -10,8 +10,6 @@
   https://www.anchor-lang.com/docs/installation  
 ```
 
-# Quick Start
-
 ## init new project
 ```
 anchor init `project_name`
