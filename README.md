@@ -1,6 +1,6 @@
 # Superteam Dao Dapp
 
-Superteam dao contract is a Bounty log proof of work onchain.
+Superteam dao dapp is a Bounty log proof of work onchain.
 
 | Program                                                    | Devnet | Mainnet Beta |
 |------------------------------------------------------------|--------|------------- |
@@ -39,6 +39,5 @@ solana logs
 ### Documents
 - [Getting started](/docs/GETTING_START.md)
 - [Tech ecosystem](/docs/TECH_ECOSYSTEM.md)
-- [Writing tests](/docs/WRITING_TEST.md)
-- [Editor](/docs/EDITOR.md)
+- [Writing tests](/tests/superteam-dao-contract.ts)
 - [Deployment](/docs/DEPLOYMENT.md)
