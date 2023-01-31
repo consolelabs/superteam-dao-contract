@@ -10,7 +10,7 @@ use crate::error::*;
 use instructions::*;
 use schemas::*;
 
-declare_id!("7cir3NiJkRvAHY5DFtnBWWDWXUMPjnJcVgwiQ9YBUS5o");
+declare_id!("9fHpouSqNrqBKLka9WeUXkRuh2Qt97nvqtP1Km99LKXb");
 
 #[program]
 pub mod superteam_dao_contract {
@@ -52,6 +52,11 @@ pub mod superteam_dao_contract {
 
     pub fn close_proposal(ctx: Context<CloseProposal>) -> Result<()> {
         close_proposal::handler(ctx);
+        Ok(())
+    }
+
+    pub fn update_nft(ctx: Context<UpdateNft>, nft: Pubkey) -> Result<()> {
+        update_nft::handler(ctx, nft);
         Ok(())
     }
 

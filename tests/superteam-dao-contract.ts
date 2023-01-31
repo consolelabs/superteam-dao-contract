@@ -114,6 +114,34 @@ describe("superteam-dao-contract", () => {
         console.log("[proposal account] sender approve : ", dataApplicantProposal);
     });
 
+    it("[receiver] approve  proposal", async () => {
+        await program.methods.receiverApproveProposal()
+            .accounts({
+                proposal: applicantProposal,
+                receiver: receiver.publicKey,
+                systemProgram: SystemProgram.programId,
+            })
+            .signers([receiver])
+            .rpc();
+
+        const dataApplicantProposal = await program.account.proposal.fetch(applicantProposal);
+        console.log("[proposal account] sender approve : ", dataApplicantProposal);
+    });
+
+    it("[receiver] update nft", async () => {
+        await program.methods.updateNft(new PublicKey("3J11Q7h5PhxvbKorARKHnG3rkqoqJqLGisCt8WWZYUBT"))
+            .accounts({
+                proposal: applicantProposal,
+                receiver: receiver.publicKey,
+                systemProgram: SystemProgram.programId,
+            })
+            .signers([receiver])
+            .rpc();
+
+        const dataApplicantProposal = await program.account.proposal.fetch(applicantProposal);
+        console.log("[proposal account] update nft approve : ", dataApplicantProposal);
+    });
+
     it("[submitter] cancel  proposal", async () => {
         const balanceBefore = await provider.connection.getBalance(payer.publicKey);
         console.log("[payer balance before close proposal]: ", balanceBefore);
@@ -180,32 +208,32 @@ describe("superteam-dao-contract", () => {
     //
     // });
 
-    it("get proposal by transaction, sender, receiver ", async () => {
-        let transaction = "3danKMRy4oyf4mD7Sun3FtnHxQGsHyxJwxBzHN1CWzaRdK6vjwEUH6gv5yNN2Cp6SPnUxwSHYbuimkNyX2zm24bZ"
-        const proposalBySender = await program.account.proposal.all([
-            {
-                memcmp: {
-                    offset: 8, // Discriminator.
-                    bytes: receiver.publicKey.toBase58(),
-                },
-            },
-            {
-                memcmp: {
-                    offset: 40, // Discriminator.
-                    bytes: sender.publicKey.toBase58(),
-                },
-            },
-            {
-                memcmp: {
-                    offset: 118, // Discriminator.
-                    bytes: bs58.encode(Buffer.from(transaction)),
-                },
-            }
-        ]);
-
-        console.log(proposalBySender);
-
-    });
+    // it("get proposal by transaction, sender, receiver ", async () => {
+    //     let transaction = "3danKMRy4oyf4mD7Sun3FtnHxQGsHyxJwxBzHN1CWzaRdK6vjwEUH6gv5yNN2Cp6SPnUxwSHYbuimkNyX2zm24bZ"
+    //     const proposalBySender = await program.account.proposal.all([
+    //         {
+    //             memcmp: {
+    //                 offset: 8, // Discriminator.
+    //                 bytes: receiver.publicKey.toBase58(),
+    //             },
+    //         },
+    //         {
+    //             memcmp: {
+    //                 offset: 40, // Discriminator.
+    //                 bytes: sender.publicKey.toBase58(),
+    //             },
+    //         },
+    //         {
+    //             memcmp: {
+    //                 offset: 118, // Discriminator.
+    //                 bytes: bs58.encode(Buffer.from(transaction)),
+    //             },
+    //         }
+    //     ]);
+    //
+    //     console.log(proposalBySender);
+    //
+    // });
 
     it("get proposal by receiver ", async () => {
         const proposal = await program.account.proposal.all([
@@ -232,7 +260,6 @@ describe("superteam-dao-contract", () => {
         ]);
 
         console.log(proposal);
-
     });
 
     it("get proposal by submitter ", async () => {

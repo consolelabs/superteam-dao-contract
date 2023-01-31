@@ -8,6 +8,7 @@ pub struct Proposal {
     pub receiver: Pubkey,
     pub sender: Pubkey,
     pub submitter: Pubkey,
+    pub nft: Pubkey,
     pub receiver_status: u8,
     pub sender_status: u8,
     pub spl: Pubkey,
@@ -26,6 +27,7 @@ impl Proposal {
         PUBKEY_SIZE + // recipient
         PUBKEY_SIZE + // sender
         PUBKEY_SIZE + // submitter
+        PUBKEY_SIZE + // nft
         1 + // receiver_status-0-pending-1-approve-2-reject
         1 + // sender_status-0-pending-1-approve-2-reject
         PUBKEY_SIZE + // spl
