@@ -37,8 +37,8 @@ solana logs
 - migrations - A basic deploy script
 
 ### Documents
-- [Getting started](./docs/GETTING_STARTED.md)
-- [Tech ecosystem](./docs/TECH_ECOSYSTEM.md)
-- [Writing tests](./docs/WRITING_TEST.md)
-- [Editor](./docs/EDITOR.md)
-- [Deployment](./docs/DEPLOYMENT.md)
+- [Getting started](/docs/GETTING_STARTED.md)
+- [Tech ecosystem](/docs/TECH_ECOSYSTEM.md)
+- [Writing tests](/docs/WRITING_TEST.md)
+- [Editor](/docs/EDITOR.md)
+- [Deployment](/docs/DEPLOYMENT.md)
